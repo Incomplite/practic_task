@@ -6,18 +6,18 @@ from django.contrib.gis.geos import Polygon
 
 class BuildingTests(APITestCase):
     def setUp(self):
-        self.valid_polygon1 = Polygon(((0, 0), (1, 0), (1, 1), (0, 1), (0, 0)))
-        self.valid_polygon2 = Polygon(((0, 0), (3, 0), (2, 2), (0, 2), (0, 0)))
-        self.valid_polygon3 = Polygon(((2, 2), (3, 2), (3, 3), (2, 3), (2, 2)))
-        self.valid_polygon4 = Polygon(((5, 5), (6, 5), (6, 6), (5, 6), (5, 5)))
-        Building.objects.create(geom=self.valid_polygon1, address="Valid Building 1")
-        Building.objects.create(geom=self.valid_polygon2, address="Valid Building 2")
-        Building.objects.create(geom=self.valid_polygon3, address="Valid Building 3")
-        Building.objects.create(geom=self.valid_polygon4, address="Valid Building 4")
+        self.valid_polygons = [
+            Polygon(((0, 0), (1, 0), (1, 1), (0, 1), (0, 0))),
+            Polygon(((0, 0), (3, 0), (2, 2), (0, 2), (0, 0))),
+            Polygon(((2, 2), (3, 2), (3, 3), (2, 3), (2, 2))),
+            Polygon(((5, 5), (6, 5), (6, 6), (5, 6), (5, 5)))
+        ]
+        for index, polygon in enumerate(self.valid_polygons):
+            Building.objects.create(geom=polygon, address=f"Building {index + 1}")
 
     def test_create_valid_building(self):
         url = reverse('building-list')
-        data = {'geom': self.valid_polygon1.geojson, 'address': "New Building"}
+        data = {'geom': self.valid_polygons[0].geojson, 'address': "New Building"}
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
